@@ -96,11 +96,13 @@
     .warn{background:#2c2410;border:1px solid #5a4a1e;color:#ffdfa0;border-radius:12px;padding:13px;font-size:13.5px;margin-bottom:14px;display:none;line-height:1.5}
 
     /* FUERZA */
-    .groups{display:flex;gap:9px;overflow-x:auto;padding:2px 2px 14px}
-    .groups::-webkit-scrollbar{display:none}
-    .group-chip{flex:0 0 auto;display:flex;align-items:center;gap:8px;background:var(--surface);
-      border:1px solid var(--line);border-radius:13px;padding:11px 14px;font-weight:600;font-size:14px}
-    .group-chip .ic{width:18px;height:18px;color:var(--accent)}
+    .groups{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:2px 2px 16px}
+    .group-card{display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--surface);
+      border:1px solid var(--line);border-radius:14px;padding:13px 6px 12px;font-weight:600;font-size:13px}
+    .group-card .fig{height:74px}
+    .group-card svg{height:74px;width:auto;display:block}
+    .exthumb{width:58px;height:44px;border-radius:9px;object-fit:cover;background:#eef0f3;flex:0 0 auto}
+    .exthumb.ph{display:flex;align-items:center;justify-content:center;color:var(--muted);background:var(--surface2);border:1px solid var(--line)}
     .ex-card{padding:15px;margin-bottom:12px}
     .ex-card .exhead{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
     .ex-card .exname{font-size:16px;font-weight:650;letter-spacing:-0.01em}
@@ -116,8 +118,8 @@
     .setrow .xx{font-size:13px;color:var(--muted)}
     .addset{margin-top:12px;font-size:14px;color:var(--accent);font-weight:650;display:inline-flex;align-items:center;gap:6px;padding:4px}
     .empty-f{color:var(--muted);text-align:center;padding:28px 14px;font-size:14px;line-height:1.6}
-    .ex-list{margin:4px 0 2px;max-height:48vh;overflow:auto}
-    .ex-list button{display:block;width:100%;text-align:left;padding:14px 4px;border-bottom:1px solid var(--line);font-size:16px;color:var(--text)}
+    .ex-list{margin:4px 0 2px;max-height:52vh;overflow:auto}
+    .ex-list button{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:9px 4px;border-bottom:1px solid var(--line);font-size:15.5px;color:var(--text)}
     .ex-list button:last-child{border-bottom:none}
     .cron-time{font-size:56px;font-weight:750;text-align:center;font-variant-numeric:tabular-nums;letter-spacing:-0.02em;margin:14px 0 20px}
 
@@ -244,6 +246,7 @@
         <div class="groups" id="groups"></div>
         <div id="fuerzaSession"></div>
         <button class="btn" id="saveFuerzaBtn" disabled style="margin-top:4px">Guardar entrenamiento</button>
+        <p class="note">Imágenes de ejercicios: free-exercise-db (dominio público).</p>
       </section>
 
       <!-- FAMILIA -->
@@ -435,23 +438,43 @@
       renderPerfil(); $('modal').classList.add('hidden'); toast('Perfil guardado'); });
 
     // ================= FUERZA =================
+    const EXIMG='https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/';
     const GRUPOS=[{id:'pecho',nombre:'Pecho'},{id:'espalda',nombre:'Espalda'},{id:'piernas',nombre:'Piernas'},
       {id:'hombros',nombre:'Hombros'},{id:'brazos',nombre:'Brazos'},{id:'core',nombre:'Abdomen'}];
     const EJERCICIOS={
-      pecho:[['Press de banca','reps'],['Press inclinado','reps'],['Aperturas','reps'],['Flexiones','reps'],['Fondos (dips)','reps']],
-      espalda:[['Dominadas','reps'],['Remo con barra','reps'],['Remo con mancuerna','reps'],['Jalón al pecho','reps'],['Peso muerto','reps']],
-      piernas:[['Sentadillas','reps'],['Prensa','reps'],['Zancadas','reps'],['Peso muerto rumano','reps'],['Elevación de gemelos','reps']],
-      hombros:[['Press militar','reps'],['Elevaciones laterales','reps'],['Elevaciones frontales','reps'],['Pájaros','reps'],['Encogimientos','reps']],
-      brazos:[['Curl de bíceps','reps'],['Curl martillo','reps'],['Extensión de tríceps','reps'],['Press francés','reps'],['Fondos de tríceps','reps']],
-      core:[['Plancha','tiempo'],['Abdominales','reps'],['Elevación de piernas','reps'],['Russian twist','reps'],['Mountain climbers','tiempo']]
+      pecho:[['Press de banca','reps','Barbell_Bench_Press_-_Medium_Grip/0.jpg'],['Press inclinado','reps','Incline_Dumbbell_Press/0.jpg'],['Press con mancuernas','reps','Dumbbell_Bench_Press/0.jpg'],['Aperturas con mancuernas','reps','Dumbbell_Flyes/0.jpg'],['Cruce de poleas','reps','Cable_Crossover/0.jpg'],['Flexiones','reps','Pushups/0.jpg'],['Fondos en paralelas','reps','Dips_-_Chest_Version/0.jpg']],
+      espalda:[['Dominadas','reps','Pullups/0.jpg'],['Jalón al pecho','reps','Wide-Grip_Lat_Pulldown/0.jpg'],['Remo con barra','reps','Bent_Over_Barbell_Row/0.jpg'],['Remo con mancuerna','reps','One-Arm_Dumbbell_Row/0.jpg'],['Remo en polea sentado','reps','Seated_Cable_Rows/0.jpg'],['Peso muerto','reps','Barbell_Deadlift/0.jpg']],
+      piernas:[['Sentadilla','reps','Barbell_Full_Squat/0.jpg'],['Prensa','reps','Leg_Press/0.jpg'],['Extensión de cuádriceps','reps','Leg_Extensions/0.jpg'],['Curl femoral','reps','Lying_Leg_Curls/0.jpg'],['Peso muerto rumano','reps','Romanian_Deadlift/0.jpg'],['Zancadas','reps','Dumbbell_Lunges/0.jpg'],['Elevación de gemelos','reps','Standing_Calf_Raises/0.jpg']],
+      hombros:[['Press militar','reps','Standing_Military_Press/0.jpg'],['Press con mancuernas','reps','Dumbbell_Shoulder_Press/0.jpg'],['Elevaciones laterales','reps','Side_Lateral_Raise/0.jpg'],['Elevaciones frontales','reps','Front_Dumbbell_Raise/0.jpg'],['Pájaros','reps','Reverse_Flyes/0.jpg'],['Encogimientos','reps','Dumbbell_Shrug/0.jpg']],
+      brazos:[['Curl con barra','reps','Barbell_Curl/0.jpg'],['Curl con mancuernas','reps','Dumbbell_Bicep_Curl/0.jpg'],['Curl martillo','reps','Hammer_Curls/0.jpg'],['Extensión de tríceps en polea','reps','Triceps_Pushdown/0.jpg'],['Press francés','reps','Lying_Triceps_Press/0.jpg'],['Fondos de tríceps en banco','reps','Bench_Dips/0.jpg']],
+      core:[['Plancha','tiempo','Plank/0.jpg'],['Abdominales','reps','Crunches/0.jpg'],['Elevación de piernas','reps','Hanging_Leg_Raise/0.jpg'],['Russian twist','reps','Cable_Russian_Twists/0.jpg'],['Mountain climbers','tiempo','Mountain_Climbers/0.jpg'],['Plancha lateral','tiempo','Side_Bridge/0.jpg']]
     };
+    function bodyFig(g){
+      const base='#39434f', hi='var(--accent)';
+      const body=`<circle cx="60" cy="20" r="12"/><path d="M44 40 L76 40 L70 96 L50 96 Z"/>`+
+        `<ellipse cx="41" cy="47" rx="9" ry="8"/><ellipse cx="79" cy="47" rx="9" ry="8"/>`+
+        `<rect x="29" y="50" width="11" height="30" rx="5"/><rect x="80" y="50" width="11" height="30" rx="5"/>`+
+        `<rect x="28" y="79" width="10" height="27" rx="5"/><rect x="82" y="79" width="10" height="27" rx="5"/>`+
+        `<path d="M50 96 L70 96 L68 113 L52 113 Z"/>`+
+        `<rect x="48" y="112" width="11" height="44" rx="5"/><rect x="61" y="112" width="11" height="44" rx="5"/>`+
+        `<rect x="49" y="157" width="9" height="36" rx="4"/><rect x="62" y="157" width="9" height="36" rx="4"/>`;
+      const hiS={
+        pecho:`<ellipse cx="53" cy="55" rx="9" ry="7"/><ellipse cx="67" cy="55" rx="9" ry="7"/>`,
+        core:`<rect x="52" y="66" width="16" height="24" rx="4"/>`,
+        hombros:`<ellipse cx="41" cy="47" rx="9" ry="8"/><ellipse cx="79" cy="47" rx="9" ry="8"/>`,
+        brazos:`<rect x="29" y="50" width="11" height="30" rx="5"/><rect x="80" y="50" width="11" height="30" rx="5"/>`,
+        piernas:`<rect x="48" y="112" width="11" height="44" rx="5"/><rect x="61" y="112" width="11" height="44" rx="5"/><rect x="49" y="157" width="9" height="36" rx="4"/><rect x="62" y="157" width="9" height="36" rx="4"/>`,
+        espalda:`<path d="M48 44 L55 44 L53 90 L46 78 Z"/><path d="M72 44 L65 44 L67 90 L74 78 Z"/><rect x="58" y="42" width="4" height="48" rx="2"/>`
+      };
+      return `<svg viewBox="0 0 120 205" fill="${base}"><g>${body}</g><g fill="${hi}">${hiS[g]||''}</g></svg>`;
+    }
     let fuerzaSesion=[], pickerGrupo=null;
     function customEx(){ try{return JSON.parse(localStorage.getItem('cinta_ejercicios_custom'))||{};}catch(e){return {};} }
     function saveCustomEx(o){ try{localStorage.setItem('cinta_ejercicios_custom',JSON.stringify(o));}catch(e){} }
 
     function renderGroups(){ const g=$('groups'); g.innerHTML='';
-      GRUPOS.forEach(gr=>{ const c=document.createElement('button'); c.className='group-chip';
-        c.innerHTML=`<svg class="ic"><use href="#ic-dumbbell"/></svg>${gr.nombre}`;
+      GRUPOS.forEach(gr=>{ const c=document.createElement('button'); c.className='group-card';
+        c.innerHTML=`<div class="fig">${bodyFig(gr.id)}</div><span>${gr.nombre}</span>`;
         c.addEventListener('click',()=>openPicker(gr)); g.appendChild(c); }); }
 
     function renderFuerza(){
@@ -475,9 +498,10 @@
               `<button class="iconbtn" data-rm="${ei}:${si}" aria-label="Quitar serie"><svg class="ic" style="width:17px;height:17px"><use href="#ic-trash"/></svg></button></div>`;
           }
         });
+        const thumb = ex.img ? `<img class="exthumb" loading="lazy" src="${EXIMG}${ex.img}" alt="" onerror="this.style.visibility='hidden'">` : '';
         const card=document.createElement('div'); card.className='card ex-card';
         card.innerHTML=
-          `<div class="exhead"><div><div class="exname">${escapeHtml(ex.nombre)}</div><div class="exgrp">${escapeHtml(ex.grupo)}</div></div>`+
+          `<div class="exhead"><div style="display:flex;gap:11px;align-items:center;min-width:0">${thumb}<div style="min-width:0"><div class="exname">${escapeHtml(ex.nombre)}</div><div class="exgrp">${escapeHtml(ex.grupo)}</div></div></div>`+
           `<button class="iconbtn" data-del="${ei}" aria-label="Quitar ejercicio"><svg class="ic" style="width:18px;height:18px"><use href="#ic-trash"/></svg></button></div>`+
           `<div class="modemini"><button class="${ex.modo==='reps'?'on':''}" data-mode="${ei}:reps">Reps y peso</button><button class="${ex.modo==='tiempo'?'on':''}" data-mode="${ei}:tiempo">Tiempo</button></div>`+
           sets+
@@ -504,17 +528,21 @@
 
     function openPicker(gr){ pickerGrupo=gr; $('pickerTitle').textContent=gr.nombre;
       const list=$('exList'); list.innerHTML='';
-      (EJERCICIOS[gr.id]||[]).concat(customEx()[gr.id]||[]).forEach(([nombre,modo])=>{
-        const b=document.createElement('button'); b.textContent=nombre;
-        b.addEventListener('click',()=>addExercise(nombre,modo,gr.nombre)); list.appendChild(b); });
+      (EJERCICIOS[gr.id]||[]).concat(customEx()[gr.id]||[]).forEach(([nombre,modo,img])=>{
+        const b=document.createElement('button');
+        const thumb = img
+          ? `<img class="exthumb" loading="lazy" src="${EXIMG}${img}" alt="" onerror="this.style.visibility='hidden'">`
+          : `<span class="exthumb ph"><svg class="ic" style="width:20px;height:20px"><use href="#ic-dumbbell"/></svg></span>`;
+        b.innerHTML=`${thumb}<span>${escapeHtml(nombre)}</span>`;
+        b.addEventListener('click',()=>addExercise(nombre,modo,gr.nombre,img)); list.appendChild(b); });
       $('customEx').value=''; $('pickerModal').classList.remove('hidden'); }
-    function addExercise(nombre,modo,grupoNombre){
-      fuerzaSesion.push({nombre,grupo:grupoNombre,modo:modo||'reps',series:[modo==='tiempo'?{seg:''}:{reps:'',peso:''}]});
+    function addExercise(nombre,modo,grupoNombre,img){
+      fuerzaSesion.push({nombre,grupo:grupoNombre,modo:modo||'reps',img:img||'',series:[modo==='tiempo'?{seg:''}:{reps:'',peso:''}]});
       $('pickerModal').classList.add('hidden'); renderFuerza(); }
     $('pickerCancel').addEventListener('click',()=>$('pickerModal').classList.add('hidden'));
     $('customAdd').addEventListener('click',()=>{ const n=$('customEx').value.trim(); if(!n||!pickerGrupo) return;
       const o=customEx(); (o[pickerGrupo.id]=o[pickerGrupo.id]||[]).push([n,'reps']); saveCustomEx(o);
-      addExercise(n,'reps',pickerGrupo.nombre); });
+      addExercise(n,'reps',pickerGrupo.nombre,''); });
 
     // cronómetro
     let cronTarget=null, cronSec=0, cronInt=null;

@@ -151,6 +151,34 @@
     .pw-stat b{font-variant-numeric:tabular-nums}
     .stack>.btn{margin-bottom:12px}
 
+    /* RUTINAS */
+    .rlabel{font-size:13px;color:var(--muted);font-weight:650;margin:2px 2px 9px;letter-spacing:.01em}
+    .chips{display:flex;gap:9px;overflow-x:auto;padding:0 2px 4px;margin-bottom:14px}
+    .chip{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);
+      border-radius:12px;padding:9px 11px;flex:0 0 auto;max-width:72%}
+    .chip .cn{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .chip .cp{color:var(--accent);display:flex;padding:2px}
+    .chip .cx{color:var(--muted);display:flex;padding:2px}
+    .rut-card{display:flex;align-items:center;gap:13px;width:100%;text-align:left;padding:15px;margin-bottom:11px}
+    .rut-card .ri{width:44px;height:44px;border-radius:12px;background:var(--surface2);border:1px solid var(--line);
+      display:flex;align-items:center;justify-content:center;color:var(--accent);flex:0 0 auto}
+    .rut-card .rt{display:block;font-size:15.5px;font-weight:650;letter-spacing:-0.01em}
+    .rut-card .rd{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+    .rut-card .rchev{margin-left:auto;color:var(--muted);display:flex;flex:0 0 auto}
+
+    /* REPRODUCTOR CORRER */
+    .run-modal{text-align:center}
+    .run-kicker{font-size:13px;color:var(--muted);font-weight:650}
+    .run-phase{font-size:27px;font-weight:750;letter-spacing:-0.02em;margin:7px 0 2px;line-height:1.15}
+    .run-phase.correr{color:var(--accent)} .run-phase.caminar{color:#4aa3ff}
+    .run-time{font-size:68px;font-weight:750;font-variant-numeric:tabular-nums;line-height:1;letter-spacing:-0.03em;margin:8px 0}
+    .run-next{font-size:14px;color:var(--muted);min-height:20px}
+    .run-bar{height:8px;background:var(--surface2);border-radius:999px;overflow:hidden;margin:18px 0 4px}
+    .run-bar>i{display:block;height:100%;background:var(--accent);border-radius:999px;transition:width .3s linear}
+    .run-steps{font-size:12.5px;color:var(--muted);margin-top:8px;font-variant-numeric:tabular-nums;min-height:16px}
+    .run-ctrls{display:flex;gap:11px;margin-top:20px}
+    .run-ctrls .btn{flex:1}
+
     /* NAV */
     .nav{position:fixed;left:0;right:0;bottom:0;z-index:15;background:rgba(11,14,19,.86);
       backdrop-filter:blur(14px);border-top:1px solid var(--line);
@@ -196,6 +224,9 @@
     <symbol id="ic-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></symbol>
     <symbol id="ic-timer" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2"/><path d="M9 2h6"/></symbol>
     <symbol id="ic-trash" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></symbol>
+    <symbol id="ic-play" viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4"/></symbol>
+    <symbol id="ic-chev" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></symbol>
+    <symbol id="ic-save" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></symbol>
   </svg>
 
   <!-- LOGIN -->
@@ -238,14 +269,18 @@
         </div>
         <button class="btn" id="saveBtn" disabled>Guardar entrenamiento</button>
         <p class="note">Pulsa «Conectar cinta» y elige <b>FS-6C0481</b>. Al terminar, «Guardar».</p>
+        <div class="rlabel" style="margin-top:24px">Rutinas guiadas</div>
+        <div id="rutCorrer"></div>
         <details><summary>Registro técnico (para resolver problemas)</summary><div id="log"></div></details>
       </section>
 
       <!-- FUERZA -->
       <section id="viewFuerza" class="hidden">
+        <div id="rutFuerza"></div>
         <div class="groups" id="groups"></div>
         <div id="fuerzaSession"></div>
-        <button class="btn" id="saveFuerzaBtn" disabled style="margin-top:4px">Guardar entrenamiento</button>
+        <button class="btn ghost hidden" id="saveRutBtn" style="margin-top:4px;margin-bottom:12px"><svg class="ic" style="width:17px;height:17px"><use href="#ic-save"/></svg> Guardar como rutina</button>
+        <button class="btn" id="saveFuerzaBtn" disabled>Guardar entrenamiento</button>
         <p class="note">Imágenes de ejercicios: free-exercise-db (dominio público).</p>
       </section>
 
@@ -318,13 +353,67 @@
     </div>
   </div>
 
-  <!-- MODAL cronómetro -->
+  <!-- MODAL cronómetro (cuenta atrás) -->
   <div id="cronModal" class="overlay hidden">
-    <div class="modal">
-      <h2>Cronómetro</h2>
-      <div class="cron-time" id="cronTime">0:00</div>
-      <div class="row2"><button class="btn ghost" id="cronToggle">Iniciar</button><button class="btn" id="cronUse">Usar tiempo</button></div>
+    <div class="modal" style="text-align:center">
+      <h2>Tiempo del ejercicio</h2>
+      <p class="sub">Ajusta el tiempo, pulsa iniciar y suena al terminar.</p>
+      <div class="stepper" style="justify-content:center;margin-top:18px">
+        <button id="cronMinus" aria-label="Quitar 15 s"><svg class="ic"><use href="#ic-minus"/></svg></button>
+        <span class="cron-time" id="cronTime" style="margin:0;min-width:150px">1:00</span>
+        <button id="cronPlus" aria-label="Añadir 15 s"><svg class="ic"><use href="#ic-plus"/></svg></button>
+      </div>
+      <div class="run-ctrls"><button class="btn ghost" id="cronToggle">Iniciar</button><button class="btn" id="cronUse">Usar tiempo</button></div>
       <button class="btn ghost" id="cronCancel" style="margin-top:12px">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- MODAL descanso -->
+  <div id="restModal" class="overlay hidden">
+    <div class="modal" style="text-align:center">
+      <h2>Descanso</h2>
+      <p class="sub">Descansa y suena cuando toca seguir.</p>
+      <div class="stepper" style="justify-content:center;margin-top:18px">
+        <button id="restMinus" aria-label="Quitar 15 s"><svg class="ic"><use href="#ic-minus"/></svg></button>
+        <span class="cron-time" id="restTime" style="margin:0;min-width:150px">1:00</span>
+        <button id="restPlus" aria-label="Añadir 15 s"><svg class="ic"><use href="#ic-plus"/></svg></button>
+      </div>
+      <div id="restPresets" style="display:flex;gap:9px;justify-content:center;margin-top:14px;flex-wrap:wrap">
+        <button class="btn ghost sm" data-rest="30">30 s</button>
+        <button class="btn ghost sm" data-rest="60">1 min</button>
+        <button class="btn ghost sm" data-rest="90">1:30</button>
+        <button class="btn ghost sm" data-rest="120">2 min</button>
+      </div>
+      <div class="run-ctrls"><button class="btn ghost" id="restToggle">Iniciar</button><button class="btn" id="restDone">Listo</button></div>
+    </div>
+  </div>
+
+  <!-- MODAL guardar rutina de fuerza -->
+  <div id="rutNameModal" class="overlay hidden">
+    <div class="modal">
+      <h2>Guardar como rutina</h2>
+      <p class="sub">Ponle un nombre para repetirla cuando quieras.</p>
+      <label for="rutNameInput">Nombre de la rutina</label>
+      <input type="text" id="rutNameInput" maxlength="30" placeholder="Ej. Pecho y tríceps" />
+      <div class="row2"><button class="btn ghost" id="rutNameCancel">Cancelar</button><button class="btn" id="rutNameSave">Guardar</button></div>
+    </div>
+  </div>
+
+  <!-- MODAL reproductor de rutina de correr -->
+  <div id="runModal" class="overlay hidden">
+    <div class="modal run-modal">
+      <div class="run-kicker" id="runName">Rutina</div>
+      <div class="run-phase" id="runPhase">—</div>
+      <div class="run-time" id="runTime">0:00</div>
+      <div class="run-next" id="runNext"></div>
+      <div class="run-bar"><i id="runBar" style="width:0%"></i></div>
+      <div class="run-steps" id="runSteps"></div>
+      <div class="run-ctrls" id="runCtrls">
+        <button class="btn ghost" id="runToggle">Pausar</button>
+        <button class="btn ghost" id="runSkip">Saltar</button>
+      </div>
+      <button class="btn hidden" id="runSave" style="margin-top:12px">Guardar sesión</button>
+      <button class="btn danger" id="runStop" style="margin-top:12px">Terminar</button>
     </div>
   </div>
 
@@ -347,6 +436,16 @@
     let toastTimer=null;
     function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show');
       clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2800); }
+    // sonido + vibración (para cronómetros y rutinas)
+    function beep(freq,dur){ try{ const Ac=window.AudioContext||window.webkitAudioContext; if(!Ac) return;
+      const ac=beep.ac||(beep.ac=new Ac()); if(ac.state==='suspended') ac.resume();
+      const o=ac.createOscillator(), g=ac.createGain(); o.type='sine'; o.frequency.value=freq||800;
+      o.connect(g); g.connect(ac.destination); const t=ac.currentTime;
+      g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.35,t+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+(dur||0.45)); o.start(t); o.stop(t+(dur||0.45)+0.03);
+    }catch(e){} }
+    function dingDing(){ beep(880,0.25); setTimeout(()=>beep(1175,0.4),260); }
+    function vibrate(p){ try{ navigator.vibrate&&navigator.vibrate(p); }catch(e){} }
     function startOfWeek(){ const d=new Date(); const off=(d.getDay()+6)%7; d.setHours(0,0,0,0); d.setDate(d.getDate()-off); return d; }
     const toMin = sec => Math.round((sec||0)/60);
     function ringHtml(ses, obj, done){
@@ -400,6 +499,7 @@
         $('nav'+k[0].toUpperCase()+k.slice(1)).classList.toggle('active', k===w);
       });
       $('viewTitle').textContent = TITLES[w];
+      if(w==='correr') renderRutCorrer();
       if(w==='fuerza') renderFuerza();
       if(w==='familia') loadDashboard();
       if(w==='perfil') renderPerfil();
@@ -505,10 +605,15 @@
           `<button class="iconbtn" data-del="${ei}" aria-label="Quitar ejercicio"><svg class="ic" style="width:18px;height:18px"><use href="#ic-trash"/></svg></button></div>`+
           `<div class="modemini"><button class="${ex.modo==='reps'?'on':''}" data-mode="${ei}:reps">Reps y peso</button><button class="${ex.modo==='tiempo'?'on':''}" data-mode="${ei}:tiempo">Tiempo</button></div>`+
           sets+
-          `<button class="addset" data-add="${ei}"><svg class="ic" style="width:16px;height:16px"><use href="#ic-plus"/></svg> Añadir serie</button>`;
+          `<div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:12px">`+
+          `<button class="addset" data-add="${ei}" style="margin-top:0"><svg class="ic" style="width:16px;height:16px"><use href="#ic-plus"/></svg> Añadir serie</button>`+
+          `<button class="addset" data-restopen="1" style="margin-top:0;color:var(--muted)"><svg class="ic" style="width:16px;height:16px"><use href="#ic-timer"/></svg> Descanso</button>`+
+          `</div>`;
         box.appendChild(card);
       });
       $('saveFuerzaBtn').disabled = fuerzaSesion.length===0;
+      $('saveRutBtn').classList.toggle('hidden', fuerzaSesion.length===0);
+      renderRutFuerza();
     }
 
     $('fuerzaSession').addEventListener('input', e=>{
@@ -524,6 +629,7 @@
       else if(b.dataset.mode){ const [ei,modo]=b.dataset.mode.split(':'); const ex=fuerzaSesion[+ei];
         if(ex.modo!==modo){ ex.modo=modo; ex.series=ex.series.map(()=> modo==='reps'?{reps:'',peso:''}:{seg:''}); renderFuerza(); } }
       else if(b.dataset.cron){ openCron(b.dataset.cron); }
+      else if(b.dataset.restopen){ openRest(); }
     });
 
     function openPicker(gr){ pickerGrupo=gr; $('pickerTitle').textContent=gr.nombre;
@@ -544,18 +650,50 @@
       const o=customEx(); (o[pickerGrupo.id]=o[pickerGrupo.id]||[]).push([n,'reps']); saveCustomEx(o);
       addExercise(n,'reps',pickerGrupo.nombre,''); });
 
-    // cronómetro
-    let cronTarget=null, cronSec=0, cronInt=null;
-    function fmtMMSS(s){ s=Math.floor(s); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
-    function stopCron(){ if(cronInt){ clearInterval(cronInt); cronInt=null; } }
-    function openCron(key){ cronTarget=key.split(':').map(Number); cronSec=0; $('cronTime').textContent='0:00';
-      stopCron(); $('cronToggle').textContent='Iniciar'; $('cronModal').classList.remove('hidden'); }
-    $('cronToggle').addEventListener('click',()=>{ if(cronInt){ stopCron(); $('cronToggle').textContent='Seguir'; }
-      else { cronInt=setInterval(()=>{ cronSec++; $('cronTime').textContent=fmtMMSS(cronSec); },1000); $('cronToggle').textContent='Pausar'; } });
+    function fmtMMSS(s){ s=Math.max(0,Math.floor(s)); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
+
+    // cronómetro de ejercicio (cuenta atrás: p. ej. plancha)
+    let cronTarget=null, cronGoal=60, cronLeft=60, cronInt=null, cronRunning=false;
+    function cronShow(){ $('cronTime').textContent=fmtMMSS(cronLeft); }
+    function stopCron(){ if(cronInt){ clearInterval(cronInt); cronInt=null; } cronRunning=false; }
+    function openCron(key){
+      cronTarget=key.split(':').map(Number);
+      const cur=Number(fuerzaSesion[cronTarget[0]].series[cronTarget[1]].seg)||0;
+      cronGoal=cur>0?cur:60; cronLeft=cronGoal; cronShow();
+      stopCron(); $('cronToggle').textContent='Iniciar'; $('cronModal').classList.remove('hidden');
+    }
+    function cronAdjust(d){ if(cronRunning) return; cronGoal=Math.max(5,cronGoal+d); cronLeft=cronGoal; cronShow(); }
+    $('cronMinus').addEventListener('click',()=>cronAdjust(-15));
+    $('cronPlus').addEventListener('click',()=>cronAdjust(15));
+    $('cronToggle').addEventListener('click',()=>{
+      if(cronRunning){ stopCron(); $('cronToggle').textContent='Seguir'; return; }
+      cronRunning=true; $('cronToggle').textContent='Pausar'; beep(660,0.12);
+      cronInt=setInterval(()=>{ cronLeft--; cronShow();
+        if(cronLeft<=0){ stopCron(); cronLeft=0; cronShow(); $('cronToggle').textContent='Iniciar';
+          dingDing(); vibrate([200,80,200]); toast('¡Tiempo!'); } },1000);
+    });
     $('cronUse').addEventListener('click',()=>{ stopCron();
-      if(cronTarget){ const [ei,si]=cronTarget; fuerzaSesion[ei].series[si]={seg:Math.round(cronSec)}; renderFuerza(); }
+      if(cronTarget){ const [ei,si]=cronTarget; fuerzaSesion[ei].series[si]={seg:cronGoal}; renderFuerza(); }
       $('cronModal').classList.add('hidden'); });
     $('cronCancel').addEventListener('click',()=>{ stopCron(); $('cronModal').classList.add('hidden'); });
+
+    // temporizador de descanso entre series
+    let restGoal=60, restLeft=60, restInt=null, restRunning=false;
+    function restShow(){ $('restTime').textContent=fmtMMSS(restLeft); }
+    function stopRest(){ if(restInt){ clearInterval(restInt); restInt=null; } restRunning=false; }
+    function openRest(){ restGoal=60; restLeft=60; restShow(); stopRest(); $('restToggle').textContent='Iniciar'; $('restModal').classList.remove('hidden'); }
+    function restSet(sec){ if(restRunning) return; restGoal=Math.max(5,sec); restLeft=restGoal; restShow(); }
+    $('restMinus').addEventListener('click',()=>restSet(restGoal-15));
+    $('restPlus').addEventListener('click',()=>restSet(restGoal+15));
+    $('restPresets').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b&&b.dataset.rest) restSet(+b.dataset.rest); });
+    $('restToggle').addEventListener('click',()=>{
+      if(restRunning){ stopRest(); $('restToggle').textContent='Seguir'; return; }
+      restRunning=true; $('restToggle').textContent='Pausar'; beep(660,0.12);
+      restInt=setInterval(()=>{ restLeft--; restShow();
+        if(restLeft<=0){ stopRest(); restLeft=0; restShow(); $('restToggle').textContent='Iniciar';
+          dingDing(); vibrate([200,80,200]); toast('¡A seguir!'); } },1000);
+    });
+    $('restDone').addEventListener('click',()=>{ stopRest(); $('restModal').classList.add('hidden'); });
 
     // guardar fuerza
     $('saveFuerzaBtn').addEventListener('click', async ()=>{
@@ -571,6 +709,129 @@
       $('saveFuerzaBtn').textContent='Guardar entrenamiento';
       if(error){ toast(/detalles/.test(error.message)?'Falta la columna "detalles" en Supabase (ver abajo)':'No se pudo guardar'); $('saveFuerzaBtn').disabled=false; return; }
       toast('¡Entrenamiento de fuerza guardado!'); fuerzaSesion=[]; renderFuerza();
+    });
+
+    // ================= RUTINAS DE FUERZA (guardar y repetir) =================
+    function rutKey(){ return 'cinta_rutinas_'+(me?me.id:'anon'); }
+    function getRutFuerza(){ try{ return JSON.parse(localStorage.getItem(rutKey()))||[]; }catch(e){ return []; } }
+    function setRutFuerza(a){ try{ localStorage.setItem(rutKey(),JSON.stringify(a)); }catch(e){} }
+    function renderRutFuerza(){
+      const box=$('rutFuerza'); const rut=getRutFuerza();
+      if(!rut.length){ box.innerHTML=''; return; }
+      let chips='';
+      rut.forEach((r,i)=>{ chips+=
+        `<div class="chip"><button class="cp" data-load="${i}" aria-label="Usar rutina"><svg class="ic" style="width:16px;height:16px"><use href="#ic-play"/></svg></button>`+
+        `<span class="cn">${escapeHtml(r.nombre)}</span>`+
+        `<button class="cx" data-delrut="${i}" aria-label="Borrar rutina"><svg class="ic" style="width:15px;height:15px"><use href="#ic-trash"/></svg></button></div>`; });
+      box.innerHTML=`<div class="rlabel">Mis rutinas</div><div class="chips">${chips}</div>`;
+    }
+    $('rutFuerza').addEventListener('click', e=>{
+      const b=e.target.closest('button'); if(!b) return;
+      if(b.dataset.load!==undefined){ loadRutFuerza(+b.dataset.load); }
+      else if(b.dataset.delrut!==undefined){ const a=getRutFuerza(); a.splice(+b.dataset.delrut,1); setRutFuerza(a); renderRutFuerza(); toast('Rutina borrada'); }
+    });
+    function loadRutFuerza(i){
+      const r=getRutFuerza()[i]; if(!r) return;
+      fuerzaSesion = r.ejercicios.map(ex=>({ nombre:ex.nombre, grupo:ex.grupo, modo:ex.modo||'reps', img:ex.img||'',
+        series: Array.from({length:Math.max(1,ex.sets||1)}, ()=> (ex.modo==='tiempo'?{seg:''}:{reps:'',peso:''})) }));
+      renderFuerza(); toast('Rutina cargada: '+r.nombre);
+    }
+    $('saveRutBtn').addEventListener('click', ()=>{ if(!fuerzaSesion.length) return;
+      $('rutNameInput').value=''; $('rutNameModal').classList.remove('hidden'); setTimeout(()=>$('rutNameInput').focus(),60); });
+    $('rutNameCancel').addEventListener('click', ()=>$('rutNameModal').classList.add('hidden'));
+    function saveRutaFuerza(){
+      const n=$('rutNameInput').value.trim(); if(!n){ $('rutNameInput').focus(); return; }
+      const ejercicios=fuerzaSesion.map(ex=>({nombre:ex.nombre,grupo:ex.grupo,modo:ex.modo,img:ex.img||'',sets:ex.series.length}));
+      const a=getRutFuerza(); a.push({nombre:n,ejercicios}); setRutFuerza(a);
+      $('rutNameModal').classList.add('hidden'); renderRutFuerza(); toast('Rutina guardada');
+    }
+    $('rutNameSave').addEventListener('click', saveRutaFuerza);
+    $('rutNameInput').addEventListener('keydown', e=>{ if(e.key==='Enter') saveRutaFuerza(); });
+
+    // ================= RUTINAS DE CORRER (guiadas) =================
+    function intervalos(n,a,b){ const o=[]; for(let i=0;i<n;i++){ o.push({...a},{...b}); } return o; }
+    const RUT_CORRER=[
+      {nombre:'Caminata suave', desc:'20 min a paso cómodo', fases:[{t:'Caminar',tipo:'caminar',seg:1200}]},
+      {nombre:'Principiante', desc:'Camina y trota · ~28 min', fases:[
+        {t:'Calentar · camina',tipo:'caminar',seg:300},
+        ...intervalos(6,{t:'Trota suave',tipo:'correr',seg:60},{t:'Camina',tipo:'caminar',seg:120}),
+        {t:'Enfriar · camina',tipo:'caminar',seg:300}]},
+      {nombre:'Intermedio', desc:'Corre y camina · ~21 min', fases:[
+        {t:'Calentar · camina',tipo:'caminar',seg:180},
+        ...intervalos(5,{t:'Corre',tipo:'correr',seg:120},{t:'Camina',tipo:'caminar',seg:60}),
+        {t:'Enfriar · camina',tipo:'caminar',seg:180}]},
+      {nombre:'Intervalos fuertes', desc:'Sprints cortos · ~18 min', fases:[
+        {t:'Calentar · camina',tipo:'caminar',seg:180},
+        ...intervalos(8,{t:'Corre fuerte',tipo:'correr',seg:30},{t:'Camina',tipo:'caminar',seg:60}),
+        {t:'Enfriar · camina',tipo:'caminar',seg:180}]}
+    ];
+    const totSeg = r => r.fases.reduce((a,f)=>a+f.seg,0);
+    function renderRutCorrer(){
+      const box=$('rutCorrer'); box.innerHTML='';
+      RUT_CORRER.forEach(r=>{
+        const b=document.createElement('button'); b.className='card rut-card';
+        b.innerHTML=`<span class="ri"><svg class="ic"><use href="#ic-play"/></svg></span>`+
+          `<span style="min-width:0"><span class="rt">${escapeHtml(r.nombre)}</span><span class="rd">${escapeHtml(r.desc)}</span></span>`+
+          `<span class="rchev"><svg class="ic" style="width:20px;height:20px"><use href="#ic-chev"/></svg></span>`;
+        b.addEventListener('click',()=>startRun(r)); box.appendChild(b);
+      });
+    }
+
+    // reproductor de rutina de correr
+    let runR=null, runFlat=[], runIdx=0, runLeft=0, runInt=null, runPaused=false, runDoneSec=0, runWake=null;
+    async function startRun(r){
+      runR=r; runFlat=r.fases.slice(); runIdx=0; runDoneSec=0; runPaused=false;
+      $('runName').textContent=r.nombre; $('runCtrls').classList.remove('hidden');
+      $('runSave').classList.add('hidden'); $('runSave').disabled=false; $('runSave').textContent='Guardar sesión';
+      $('runStop').textContent='Terminar'; $('runToggle').textContent='Pausar';
+      loadRunPhase(0); $('runModal').classList.remove('hidden');
+      try{ if('wakeLock' in navigator){ runWake=await navigator.wakeLock.request('screen'); } }catch(e){}
+      startRunTimer();
+    }
+    function loadRunPhase(i){
+      const f=runFlat[i]; runLeft=f.seg;
+      $('runPhase').textContent=f.t; $('runPhase').className='run-phase '+f.tipo;
+      $('runTime').textContent=fmtMMSS(runLeft);
+      const nx=runFlat[i+1]; $('runNext').textContent = nx? 'Luego: '+nx.t : 'Última fase';
+      $('runSteps').textContent=`Fase ${i+1} de ${runFlat.length}`;
+      updateRunBar();
+      beep(f.tipo==='correr'?880:520, 0.3); vibrate(f.tipo==='correr'?[120,60,120]:120);
+    }
+    function updateRunBar(){
+      const tot=totSeg(runR||{fases:runFlat}); if(!tot) return;
+      const before=runFlat.slice(0,runIdx).reduce((a,f)=>a+f.seg,0);
+      const cur=(runFlat[runIdx]?runFlat[runIdx].seg:0)-runLeft;
+      $('runBar').style.width=Math.min(100,((before+cur)/tot)*100).toFixed(1)+'%';
+    }
+    function startRunTimer(){ stopRunTimer(); runInt=setInterval(()=>{
+      if(runPaused) return;
+      runLeft--; runDoneSec++;
+      if(runLeft<=0){ nextRunPhase(); } else { $('runTime').textContent=fmtMMSS(runLeft); updateRunBar(); }
+    },1000); }
+    function stopRunTimer(){ if(runInt){ clearInterval(runInt); runInt=null; } }
+    function nextRunPhase(){ if(runIdx+1 < runFlat.length){ runIdx++; loadRunPhase(runIdx); } else { finishRun(); } }
+    function finishRun(){
+      stopRunTimer();
+      $('runPhase').textContent='¡Completado!'; $('runPhase').className='run-phase correr';
+      $('runTime').textContent='✓'; $('runNext').textContent=`${Math.round(runDoneSec/60)} min de ejercicio`;
+      $('runBar').style.width='100%'; $('runSteps').textContent='';
+      $('runCtrls').classList.add('hidden'); $('runStop').textContent='Cerrar';
+      if(me) $('runSave').classList.remove('hidden');
+      dingDing(); setTimeout(dingDing,500); vibrate([200,80,200,80,200]); releaseWake();
+    }
+    function releaseWake(){ try{ if(runWake){ runWake.release(); runWake=null; } }catch(e){} }
+    function closeRun(){ stopRunTimer(); releaseWake(); $('runModal').classList.add('hidden'); }
+    $('runToggle').addEventListener('click',()=>{ runPaused=!runPaused; $('runToggle').textContent=runPaused?'Seguir':'Pausar'; });
+    $('runSkip').addEventListener('click',()=>{ nextRunPhase(); });
+    $('runStop').addEventListener('click', closeRun);
+    $('runSave').addEventListener('click', async ()=>{
+      if(!me){ toast('Inicia sesión para guardar'); return; }
+      $('runSave').disabled=true; $('runSave').textContent='Guardando…';
+      const { error } = await db.from('entrenamientos').insert({ usuario_id:me.id, tipo:'cinta',
+        duracion_seg:runDoneSec, distancia_km:0, calorias:0, notas:'Rutina guiada: '+(runR?runR.nombre:'') });
+      $('runSave').disabled=false; $('runSave').textContent='Guardar sesión';
+      if(error){ toast('No se pudo guardar'); return; }
+      toast('¡Sesión guardada!'); closeRun();
     });
 
     // ================= FAMILIA =================
